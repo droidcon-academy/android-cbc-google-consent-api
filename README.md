@@ -1,2 +1,2 @@
 # Study materials and source code for **Droidcon Academy** course 
-> # Add Course Name 
+> # Streamlining OTP Verification with Google Consent API in Android with Jetpack Compose  
