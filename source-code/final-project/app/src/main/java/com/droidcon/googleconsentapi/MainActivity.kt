@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun startListenForOTP() {
         val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
-        registerReceiver(smsReceiver, intentFilter, SmsRetriever.SEND_PERMISSION, null)
+        registerReceiver(smsReceiver, intentFilter)
         SmsRetriever.getClient(this).startSmsUserConsent(null)
     }
 }
