@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.core.content.IntentCompat
 import com.droidcon.googleconsentapi.ui.screens.OtpScreen
 import com.droidcon.googleconsentapi.ui.theme.GoogleConsentApiTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
@@ -39,21 +42,23 @@ class MainActivity : ComponentActivity() {
     private val smsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             if (SmsRetriever.SMS_RETRIEVED_ACTION == intent?.action) {
-                val smsRetrieverStatus = intent.extras?.get(SmsRetriever.EXTRA_STATUS) as Status
-
-                when (smsRetrieverStatus.statusCode) {
+                val smsRetrieverStatus = IntentCompat.getParcelableExtra(
+                    intent, SmsRetriever.EXTRA_STATUS, Status::class.java
+                )
+                when (smsRetrieverStatus?.statusCode) {
                     CommonStatusCodes.SUCCESS -> {
-                        val consentIntent =
-                            intent.extras?.get(SmsRetriever.EXTRA_CONSENT_INTENT) as Intent
+                        val consentIntent = IntentCompat.getParcelableExtra(
+                            intent, SmsRetriever.EXTRA_CONSENT_INTENT, Intent::class.java
+                        )
                         try {
                             smsConsentLauncher.launch(consentIntent)
                         } catch (e: ActivityNotFoundException) {
-                            // Record the exception ...
+                            Log.e(MainActivity::class.java.simpleName, e.message, e)
                         }
                     }
 
                     CommonStatusCodes.TIMEOUT -> {
-                        // Timeout
+                        Toast.makeText(this@MainActivity, "Timeout", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
