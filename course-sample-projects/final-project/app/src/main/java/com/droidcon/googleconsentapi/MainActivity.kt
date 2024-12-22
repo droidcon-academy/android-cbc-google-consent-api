@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -88,7 +89,11 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun startListenForOTP() {
         val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
-        registerReceiver(smsReceiver, intentFilter)
+        if (Build.VERSION.SDK_INT >= 34 && applicationInfo.targetSdkVersion >= 34) {
+            registerReceiver(smsReceiver, intentFilter, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(smsReceiver, intentFilter)
+        }
         SmsRetriever.getClient(this).startSmsUserConsent(null)
     }
 }
